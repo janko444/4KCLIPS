@@ -31,3 +31,17 @@ app.post("/enhance", upload.single("video"), async (req, res) => {
 });
 
 app.listen(3000);
+
+await fetch("https://api.replicate.com/v1/predictions", {
+  method: "POST",
+  headers: {
+    Authorization: "REPLICATE_API_TOKEN=r8_FnDcjHmUevbCosqxVZ58eb9h0xASDWC2jVaeA",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    version: "REAL_ESRGAN_MODEL_ID",
+    input: {
+      image: file
+    }
+  })
+});
