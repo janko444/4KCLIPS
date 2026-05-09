@@ -2,21 +2,18 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>AE Web Editor Lite</title>
+  <title>AE Web Pro</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>🎬 After Effects Web Lite</h1>
+<h1>🎬 AE / CapCut Web PRO MAX</h1>
 
 <input type="file" id="fileInput" accept="video/*">
 
 <div class="layout">
-
   <video id="video" controls></video>
-
   <canvas id="canvas"></canvas>
-
 </div>
 
 <div class="panel">
@@ -32,6 +29,12 @@
 
   <label>Zoom</label>
   <input type="range" id="zoom" min="1" max="2" step="0.1" value="1">
+
+  <label>Shake</label>
+  <input type="range" id="shake" min="0" max="10" step="0.5" value="0">
+
+  <label>Saturation</label>
+  <input type="range" id="sat" min="0.5" max="2" step="0.1" value="1">
 
 </div>
 
