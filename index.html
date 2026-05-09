@@ -1,29 +1,43 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Video Enhancer</title>
+  <title>AE Web Editor Lite</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-  <h1>AI Video Enhancer</h1>
-  <p>Wrzuć film i popraw jego jakość AI</p>
+<h1>🎬 After Effects Web Lite</h1>
 
-  <input type="file" id="videoInput" accept="video/*">
+<input type="file" id="fileInput" accept="video/*">
 
-  <video id="preview" controls></video>
+<div class="layout">
 
-  <button id="enhanceBtn">Enhance Video</button>
+  <video id="video" controls></video>
 
-  <div id="status"></div>
+  <canvas id="canvas"></canvas>
+
 </div>
 
+<div class="panel">
+
+  <label>Brightness</label>
+  <input type="range" id="brightness" min="0.5" max="2" step="0.1" value="1">
+
+  <label>Contrast</label>
+  <input type="range" id="contrast" min="0.5" max="2" step="0.1" value="1">
+
+  <label>Blur</label>
+  <input type="range" id="blur" min="0" max="5" step="0.1" value="0">
+
+  <label>Zoom</label>
+  <input type="range" id="zoom" min="1" max="2" step="0.1" value="1">
+
+</div>
+
+<button id="export">Export Video</button>
+
 <script src="script.js"></script>
+
 </body>
 </html>
-
-
