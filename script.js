@@ -1,56 +1,74 @@
-const videoInput = document.getElementById('videoInput');
-const preview = document.getElementById('preview');
-const enhanceBtn = document.getElementById('enhanceBtn');
-const statusText = document.getElementById('status');
+const fileInput = document.getElementById("fileInput");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-let selectedFile = null;
+const brightness = document.getElementById("brightness");
+const contrast = document.getElementById("contrast");
+const blur = document.getElementById("blur");
+const zoom = document.getElementById("zoom");
 
-videoInput.addEventListener('change', (e) => {
-  selectedFile = e.target.files[0];
+let fileURL = null;
 
-  if (selectedFile) {
-    preview.src = URL.createObjectURL(selectedFile);
-  }
+// 📥 upload video
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  fileURL = URL.createObjectURL(file);
+  video.src = fileURL;
 });
 
-enhanceBtn.addEventListener('click', async () => {
+// 🎬 render engine (AE style)
+function render() {
+  requestAnimationFrame(render);
 
-  if (!selectedFile) {
-    alert('Wrzuć film');
-    return;
-  }
+  if (!video.videoWidth) return;
 
-  statusText.innerText = 'AI poprawia jakość...';
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
 
-  const API_KEY = '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';
+  ctx.save();
 
-  const formData = new FormData();
-  formData.append('file', selectedFile);
+  const scale = zoom.value;
 
-  try {
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.scale(scale, scale);
 
-    // DEMO AI REQUEST
-    const response = await fetch(
-      'https://api-inference.huggingface.co/models',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${API_KEY}`
-        },
-        body: formData
-      }
-    );
+  ctx.filter = `
+    brightness(${brightness.value})
+    contrast(${contrast.value})
+    blur(${blur.value}px)
+  `;
 
-    statusText.innerText =
-      'Film wysłany do AI!';
+  ctx.drawImage(video, -canvas.width / 2, -canvas.height / 2);
 
-  } catch (err) {
+  ctx.restore();
+}
 
-    console.error(err);
+video.addEventListener("play", render);
 
-    statusText.innerText =
-      'Błąd AI';
+// 🎥 EXPORT VIDEO
+document.getElementById("export").addEventListener("click", () => {
+  const stream = canvas.captureStream(30);
 
-  }
+  const recorder = new MediaRecorder(stream, {
+    mimeType: "video/webm"
+  });
 
+  let chunks = [];
+
+  recorder.ondataavailable = (e) => chunks.push(e.data);
+
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ae-lite.webm";
+    a.click();
+  };
+
+  recorder.start();
+
+  setTimeout(() => recorder.stop(), 6000);
 });
