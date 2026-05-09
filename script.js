@@ -9,21 +9,48 @@ videoInput.addEventListener('change', (e) => {
   selectedFile = e.target.files[0];
 
   if (selectedFile) {
-    const url = URL.createObjectURL(selectedFile);
-    preview.src = url;
+    preview.src = URL.createObjectURL(selectedFile);
   }
 });
 
 enhanceBtn.addEventListener('click', async () => {
+
   if (!selectedFile) {
-    alert('Najpierw wrzuć film');
+    alert('Wrzuć film');
     return;
   }
 
-  statusText.innerText = 'AI poprawia jakość filmu...';
+  statusText.innerText = 'AI poprawia jakość...';
 
-  // Symulacja AI processing
-  setTimeout(() => {
-    statusText.innerText = 'Gotowe! (demo version)';
-  }, 3000);
+  const API_KEY = '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';
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  try {
+
+    // DEMO AI REQUEST
+    const response = await fetch(
+      'https://api-inference.huggingface.co/models',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${API_KEY}`
+        },
+        body: formData
+      }
+    );
+
+    statusText.innerText =
+      'Film wysłany do AI!';
+
+  } catch (err) {
+
+    console.error(err);
+
+    statusText.innerText =
+      'Błąd AI';
+
+  }
+
 });
