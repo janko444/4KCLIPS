@@ -1,38 +1,105 @@
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f0f0f;
-  color: white;
-  text-align: center;
+const fileInput = document.getElementById("fileInput");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// 🎛 controls
+const brightness = document.getElementById("brightness");
+const contrast = document.getElementById("contrast");
+const blur = document.getElementById("blur");
+const zoom = document.getElementById("zoom");
+const shake = document.getElementById("shake");
+const sat = document.getElementById("sat");
+
+let fileURL = null;
+let time = 0;
+
+// 📥 FIXED UPLOAD (ważne)
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  fileURL = URL.createObjectURL(file);
+  video.src = fileURL;
+
+  video.load();
+
+  video.onloadedmetadata = () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  };
+});
+
+// 🎬 AE ENGINE (FULL PRO STACK)
+function render() {
+  requestAnimationFrame(render);
+
+  if (!video.videoWidth) return;
+
+  time += 0.016;
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx2 = ctx;
+
+  ctx2.save();
+
+  // 🎯 KEYFRAME ZOOM (AE STYLE ANIMATION)
+  const dynamicZoom = parseFloat(zoom.value) + Math.sin(time) * 0.03;
+
+  const shakeVal = parseFloat(shake.value);
+
+  const shakeX = (Math.random() - 0.5) * shakeVal;
+  const shakeY = (Math.random() - 0.5) * shakeVal;
+
+  ctx2.translate(canvas.width / 2 + shakeX, canvas.height / 2 + shakeY);
+  ctx2.scale(dynamicZoom, dynamicZoom);
+
+  // 🎨 FILTER STACK (AE / CAPCUT STYLE)
+  ctx2.filter = `
+    brightness(${brightness.value})
+    contrast(${contrast.value})
+    blur(${blur.value}px)
+    saturate(${sat.value})
+  `;
+
+  // 🎬 DRAW FRAME
+  ctx2.drawImage(
+    video,
+    -canvas.width / 2,
+    -canvas.height / 2
+  );
+
+  ctx2.restore();
 }
 
-.layout {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-}
+video.addEventListener("play", render);
 
-video, canvas {
-  width: 400px;
-  background: black;
-}
+// 🎥 EXPORT VIDEO (RENDER ENGINE)
+document.getElementById("export").addEventListener("click", () => {
+  const stream = canvas.captureStream(30);
 
-.panel {
-  margin-top: 20px;
-}
+  const recorder = new MediaRecorder(stream, {
+    mimeType: "video/webm"
+  });
 
-input {
-  width: 200px;
-  display: block;
-  margin: 10px auto;
-}
+  let chunks = [];
 
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #00ffcc;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
+  recorder.ondataavailable = (e) => chunks.push(e.data);
+
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ae-pro-video.webm";
+    a.click();
+  };
+
+  recorder.start();
+
+  // demo render 6s
+  setTimeout(() => recorder.stop(), 6000);
+});
